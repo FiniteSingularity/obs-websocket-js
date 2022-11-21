@@ -310,13 +310,16 @@ export type RequestMessage<T = keyof OBSRequestTypes> = T extends keyof OBSReque
 	requestData: OBSRequestTypes[T];
 } : never;
 
-export type RequestBatchRequest<T = keyof OBSRequestTypes> = T extends keyof OBSRequestTypes ? OBSRequestTypes[T] extends never ? {
+export type RequestBatchRequest<T = keyof OBSRequestTypes, V = Record<string, string>> = T extends keyof OBSRequestTypes ? OBSRequestTypes[T] extends never ? {
 	requestType: T;
 	requestId?: string;
+	outputVariables?: Record<string, keyof OBSResponseTypes[T]>;
 } : {
 	requestType: T;
 	requestId?: string;
-	requestData: OBSRequestTypes[T];
+	requestData: Omit<OBSRequestTypes[T], keyof V>;
+	outputVariables?: Record<string, keyof OBSResponseTypes[T]>;
+	inputVariables?: V;
 } : never;
 
 export type RequestBatchOptions = {
@@ -837,6 +840,12 @@ export interface OBSEventTypes {
 		 * True == Enabled, False == Disabled
 		 */
 		studioModeEnabled: boolean;
+	};
+	ScreenshotSaved: {
+		/**
+		 * Path of the saved image file
+		 */
+		savedScreenshotPath: string;
 	};
 	VendorEvent: {
 		/**
